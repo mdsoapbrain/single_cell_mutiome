@@ -169,7 +169,11 @@ markers_cluster3 <- FindConservedMarkers(data,
 head(markers_cluster3)
 
 # Naming the clusters
-####### naming the cluster######
+
+###############################
+###### naming the cluster #####
+###############################
+
 Idents(data)<-data$seurat_clusters
 data <- RenameIdents(data, c("0" = "Drd2-MSN", 
                              "1" = "Drd1-MSN", 
@@ -206,4 +210,153 @@ P1+P2
 dev.off()
 
 
+#########################
+###### Peak-calling #####
+#########################
 
+DefaultAssay(data2)<-"ATAC"
+CTpeaks<-CallPeaks(data2, macs2.path="/opt/anaconda3/envs/env01/bin/macs2", group.by="predict.id")
+
+chr<-c()
+for (i in 1:22){
+  chr<-c(chr, paste0("",i))
+}
+chr<-c(chr,"chrX")
+chr<-c(chr,"chrY")
+CTpeaks2<-CTpeaks[seqnames(CTpeaks) %in% chr]
+
+
+df <- as.data.frame(CTpeaks)
+df<-df[which(df$seqnames %in% chr),]
+#bed file for reanalyze [sort -k1,1 -k2,2n CT_peak_set.bed]
+write.table(df[,1:3], file="mutiome_CT_peak_set.bed", quote=F, sep="\t", row.names=F, col.names=F)
+CTpeaks2<-makeGRangesFromDataFrame(df)
+macs2_counts<-FeatureMatrix(fragments=Fragments(data2), features=CTpeaks2,cells=colnames(data2))
+
+annotation <- GetGRangesFromEnsDb(ensdb = EnsDb.Rnorvegicus.v105)
+seqlevelsStyle(annotation) <- "UCSC"
+data2[["CTpeaks"]]<-CreateChromatinAssay(counts=macs2_counts,  fragments=Fragments(data2))
+#get peak list labeled by celltype
+write.csv(df,"~/mutiome_CTpeaks_annotated.csv")
+
+
+
+saveRDS(data2, "mutiome_final.rds")
+
+# get AD and Ctrl barcodes
+df$status<-data2$Status
+ROT<-df[which(df$status=="ROT"),1:2]
+Ctrl<-df[which(df$status=="Control"),1:2]
+write.csv(ROT, "/barcodes_ROT.csv", row.names=F, quote=F)
+write.csv(Ctrl, "~/barcodes_Controll.csv", row.names=F, quote=F)
+###########
+data<-data2
+data<-readRDS("mutiome_final.rds")
+all.genes <- rownames(data)
+data <- ScaleData(data, features = all.genes)
+
+
+
+Idents(data)<-'predict.id'
+DefaultAssay(data) <- "CTpeaks"
+
+# first compute the GC content for each peak
+data<-RegionStats(data,genome=genome_rn7)
+
+# link peaks to genes
+data <- LinkPeaks(
+  object = data,
+  peak.assay = "CTpeaks",
+  expression.assay = "SCT",
+  genes.use = c("Aqp4")
+)
+data[['CTpeaks']]
+
+idents.plot <- c("Drd2-MSN", "Drd1-MSN", "Olig",
+                 "Astrocyte", "Microglia", "OPC", "Glutamatergic",'Interneuron')
+
+p1 <- CoveragePlot(
+  object = data,
+  region = "Drd2",
+  
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p2 <- CoveragePlot(
+  object = data,
+  region = "Drd1",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p3 <- CoveragePlot(
+  object = data,
+  region = "Ppp1r1b",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p4 <- CoveragePlot(
+  object = data,
+  region = "Rgs9",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p5 <- CoveragePlot(
+  object = data,
+  region = "Mbp",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p6 <- CoveragePlot(
+  object = data,
+  region = "Mog",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p7 <- CoveragePlot(
+  object = data,
+  region = "S100b",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p8 <- CoveragePlot(
+  object = data,
+  region = "Aqp4",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p9 <- CoveragePlot(
+  object = data,
+  region = "Cx3cr1",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+p10 <- CoveragePlot(
+  object = data,
+  region = "Grin2a",
+  expression.assay = "SCT",
+  idents = idents.plot,
+  extend.upstream = 500,
+  extend.downstream = 10000
+)
+pdf('coverageplot_1.pdf', width=20, height=9)
+patchwork::wrap_plots(p1, p2,p4,p5, p6, p7, p8, p9, ncol = 4)
+dev.off()
+marker_gene<-c('Drd2','Drd1','Ppp1r1b', 'Rgs9','Mbp','Mog', 'S100b', 'Aqp4', 'Cx3cr1', 'Grin2a')
