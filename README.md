@@ -3,7 +3,7 @@
 ## Overview
 This pipeline is designed for the integrated analysis of single-cell RNA-Seq (scRNA) and single-cell ATAC-Seq (scATAC) data. It covers everything from data demultiplexing to downstream analyses, including network construction, differential expression, and functional enrichment.
 
-![My Image](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/%E6%88%AA%E5%9C%96%202023-08-27%20%E4%B8%8B%E5%8D%886.43.49.png)
+![My Image](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/scmutiome_pipeline.png)
 
 
 ## Table of Contents
