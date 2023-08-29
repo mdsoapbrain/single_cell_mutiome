@@ -23,10 +23,10 @@ Demultiplex raw sequencing data using Cell Ranger - Arc.
 Cell Ranger Phase
 Make a reference with mRatBN7.
 Obtain counts using Cell Ranger count.
-## Preprocessing
+## Preprocessing [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/Preprocessing.R)
 Single-cell multiome analysis.
 Data quality control and normalization.
-## hdWGCNA Pipeline
+## hdWGCNA Pipeline [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/hdWGCNA.R)
 ### Creation of Metacell and Gene Networks
 Construct networks using hdWGCNA.
 ### Module Identification
@@ -35,31 +35,29 @@ Identify modules based on network topology.
 Perform differential analysis on module eigengenes.
 ### Functional Enrichment Analysis
 Enrich modules for biological functions.
-### Motif Overlap Network Analysis
+### Motif Overlap Network Analysis [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/motif_overlap_hdWGCNA.R)
 Analyze the overlap of motifs within and across modules.
 
 ## Chromatin Accessibility
 Analyze chromatin accessibility data.
 
-
-## Differential Analyses
-### Differential Expression Gene Analysis
+## Downstream Analysis (Differential,Motif, Feature Linkage, LDSC)
+### Differential Expression Gene Analysis [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/DEG&DAE&GeneEnrich.R)
 Identify differentially expressed genes.
-### Differential Accessibility Analysis
+### Differential Accessibility Analysis [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/DEG&DAE&GeneEnrich.R)
 Identify regions with differential chromatin accessibility.
-## Functional and Trajectory Analysis
+## Functional and Trajectory Analysis [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/DEG&DAE&GeneEnrich.R)
 - Perform pathway analysis.
 - Conduct trajectory analysis for cell differentiation.
   
-## Motif Enrichment
+### Motif Enrichment
 Perform motif enrichment analysis.
 
-## Downstream Analysis
-### Feature Linkage Analysis
+### Feature Linkage Analysis [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/Feature_linkage_analysis.R)
 Link features from different data types (e.g., RNA and ATAC).
-### LD Score Regression
+### LD Score Regression [scripts](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/prepare_LDSC.R)
 Conduct LD Score regression for genetic correlation.
-
+[LDSC](https://github.com/mdsoapbrain/single_cell_mutiome/blob/main/LDSC_analysis.sh)
 
 
 
