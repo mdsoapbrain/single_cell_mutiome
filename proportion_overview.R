@@ -1,56 +1,36 @@
-library(Seurat)
-library(WGCNA)
-library(igraph)
-library(devtools)
-library(sctransform)
-library(dplyr)
-library(scDblFinder)
-library(SingleCellExperiment)
-library(Signac)
-library(GenomicRanges)
-library(rtracklayer)
-library(EnsDb.Rnorvegicus.v105)
-library(scales)
-library(future) 
-library(harmony)
-library(ggplot2)
 
 
+# Remove all objects from the workspace
 rm(list = ls())
-data<-readRDS("mutiome_final.rds")
 
+# Load the data from an RDS file
+data <- readRDS("mutiome_final.rds")
+
+# Display the frequency table for phenotype and predict.id
 table(data$phenotype)
 table(data$predict.id)
 
 library(dplyr)
 library(ggplot2)
 
-library(dplyr)
-library(ggplot2)
-
-# 从Seurat对象中提取元数据
+# Extract metadata from the Seurat object
 metadata <- data@meta.data
 
-# 计算每个predict.id在每个phenotype中的数量
+# Calculate the count of each predict.id in each phenotype
 count_data <- metadata %>% 
   group_by(phenotype, predict.id) %>% 
   summarise(count = n())
 
-# 计算每个predict.id在每个phenotype中的比例
+# Calculate the proportion of each predict.id in each phenotype
 count_data <- count_data %>% 
   group_by(phenotype) %>% 
   mutate(proportion = count / sum(count))
 
-# 绘制累积条形图
+# Plot a stacked bar chart
 ggplot(count_data, aes(x = phenotype, y = proportion, fill = predict.id)) +
   geom_bar(stat = "identity", position = "stack") +
   labs(y = "Proportion", x = "Phenotype", fill = "Celltypes") +
   theme_minimal()
 
+# Save the count data to a CSV file
 write.csv(count_data, 'count_data.csv')
-
-
-
-
-
-
