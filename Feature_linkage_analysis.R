@@ -18,8 +18,6 @@ library(SeuratObject)
 library(cowplot)
 library(reticulate)
 library(GenomeInfoDb)
-#if (!require("BiocManager", quietly = TRUE))
-#  install.packages("BiocManager")
 
 BiocManager::install("rtracklayer", force = TRUE)
 library(rtracklayer)
@@ -138,7 +136,7 @@ interest_df <- all[,c('Peak_pos.x','Peak_pos.y','group','CT')]
 write_bed <- function(df, cell_type, group, filename) {
   df <- df[df$group == group, ]
   
-  # 對於 ROT 和 Ctrl，峰值位置可以在 Peak_pos.x 或 Peak_pos.y 列中找到
+  # For ROT and Ctrl, peak positions can be found in either the Peak_pos.x or Peak_pos.y columns
   if(group == "ROT") {
     df$Peak_pos <- ifelse(is.na(df$Peak_pos.x), df$Peak_pos.y, df$Peak_pos.x)
   } else if(group == "Ctrl") {
@@ -147,12 +145,12 @@ write_bed <- function(df, cell_type, group, filename) {
     df$Peak_pos <- df$Peak_pos.x
   }
   
-  # 將 Peak_pos 列的值分割為三個部分並提取出 chr, start 和 end
+  # Split the Peak_pos column values into three parts and extract chr, start, and end
   df$chr <- sapply(strsplit(as.character(df$Peak_pos), "-"), "[[", 1)
   df$start <- sapply(strsplit(as.character(df$Peak_pos), "-"), "[[", 2)
   df$end <- sapply(strsplit(as.character(df$Peak_pos), "-"), "[[", 3)
   
-  # 檢查 CT 列的值是否包含指定的細胞類型
+  # Check if the CT column contains the specified cell types
   df_filtered <- df[grepl(cell_type, df$CT), ]
   
   write.table(df_filtered[, c("chr", "start", "end")],
@@ -206,7 +204,7 @@ rownames(tab2)<-c("Olig","OPC","GABA-neuron",
 
 write.table(tab2, "Melt_ct_link_table.txt", sep="\t", quote=F)
 
-# 先把数据转换为适合 ggplot 的 "long" 格式
+# First, transform the data into a "long" format suitable for ggplot
 library(reshape2)
 tab2_long <- melt(tab2)
 
@@ -327,15 +325,14 @@ library(ggplot2)
 library(reshape2)
 library(viridis)
 
-# 将矩阵转换为数据框
+
 acc.melt <- melt(acc.scale)
 gex.melt <- melt(gex.scale)
 
-# 更改列名以适应ggplot2
 names(acc.melt) <- c("gene", "sample", "value")
 names(gex.melt) <- c("gene", "sample", "value")
 
-# 添加额外的列进行分组和注解
+
 acc.melt$group <- c2$group[match(acc.melt$gene, c2$gene.x)]
 gex.melt$group <- c2$group[match(gex.melt$gene, c2$gene.x)]
 
@@ -345,7 +342,7 @@ gex.melt$celltype <- substr(gex.melt$sample, 1, regexpr("_", gex.melt$sample) - 
 acc.melt$Phenotype <- ifelse(grepl("PD", acc.melt$sample), "PD", "Ctrl")
 gex.melt$Phenotype <- ifelse(grepl("PD", gex.melt$sample), "PD", "Ctrl")
 
-# ggplot2 绘制热图
+
 ggplot(acc.melt, aes(x = sample, y = gene, fill = value)) +
   geom_tile() +
   scale_fill_gradient2(low = "#290230", mid = "#CC4678FF", high = "#F0F921FF", midpoint = 0) +
@@ -370,7 +367,6 @@ ggplot(gex.melt, aes(x = sample, y = gene, fill = value)) +
                                title.position = "top", title.hjust = 0.5)) +
   facet_grid(group ~ ., scales = "free", space = "free")
 
-######## Fig 3c###########
 c2.2<-all
 
 
